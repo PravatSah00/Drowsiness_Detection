@@ -25,11 +25,12 @@ static_data = {
     "image_width"   :   640,
     "image_height"  :   480,
     "left_eye"      :   [362, 385, 387, 263, 373, 380],
-    "right_eye"     :   [33, 160, 158, 133, 153, 144]
+    "right_eye"     :   [33, 160, 158, 133, 153, 144],
+    "bounding_box"      :   [234, 10, 454, 152]
 }
 
 # ear bound:
-ear_bound = 0.2
+ear_bound = 0.26
 
 def main():
     # Define the video capture object:
@@ -56,21 +57,23 @@ def main():
 
             if result.multi_face_landmarks:
                 # Draw the landMarks and eye:
-                mp_drawing.draw_landmarks(
-                    image = image,
-                    landmark_list = result.multi_face_landmarks[0],
-                    connections = mp_facemesh.FACEMESH_TESSELATION,
-                    landmark_drawing_spec = None,
-                    connection_drawing_spec = mp_drawing_styles.get_default_face_mesh_tesselation_style()
+                # mp_drawing.draw_landmarks(
+                #     image = image,
+                #     landmark_list = result.multi_face_landmarks[0],
+                #     connections = mp_facemesh.FACEMESH_TESSELATION,
+                #     landmark_drawing_spec = None,
+                #     connection_drawing_spec = mp_drawing_styles.get_default_face_mesh_tesselation_style()
+                # )
+
+                face_x1, face_y1, face_x2, face_y2 = Utility.get_bounding_box(
+                    landmarks = result.multi_face_landmarks[0].landmark,
+                    face_inds = static_data["bounding_box"],
+                    image_width = static_data["image_width"],
+                    image_height = static_data["image_height"]
                 )
 
-                mp_drawing.draw_landmarks(
-                    image = image,
-                    landmark_list = result.multi_face_landmarks[0],
-                    connections = mp_facemesh.FACEMESH_IRISES,
-                    landmark_drawing_spec = None,
-                    connection_drawing_spec = mp_drawing_styles.get_default_face_mesh_iris_connections_style()
-                )
+                cv2.rectangle(image, (face_x1, face_y1), (face_x2, face_y2), (173, 130, 28), 3)
+
                 
                 # Calculate eye state:
                 ear = Utility.get_avg_EAR(
@@ -91,7 +94,7 @@ def main():
                     COUNTER = 0
                     sms.cooldown()
 
-                if COUNTER >= 20:
+                if COUNTER >= 15:
                     alarm.play()
                     sms.send()
                     

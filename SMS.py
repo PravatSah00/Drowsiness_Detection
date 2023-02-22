@@ -3,7 +3,7 @@ import threading
 
 keys = {
     "account_sid" : "AC78655bf7bad911618e8205127e8d888b",
-    "auth_token"  : "e14e58020a5900a8adf28f834a5cbe58",
+    "auth_token"  : "5aa689050d565e01a31b916571e919fd",
     "twilio_number" : "+15405016107"
 }
 
@@ -12,13 +12,18 @@ class SMS:
         self.client = Client(keys["account_sid"], keys["auth_token"])
         self.cool_down_state = False
         self.sms_text = "This is a warning sms!!!!"
+        try:
+            with open(r"DataDir/UserData/user_number.ff") as contact:
+                self.cotact =  contact.read()
+        except:
+            self.contact = ""
 
     def send_sms_from_client(self):
         try:
             message = self.client.messages.create(
                 body = self.sms_text,
                 from_ = keys["twilio_number"],
-                to = "+917384797488"
+                to = "+91" + self.contact
             )
         except:
             print("ERROR !!!! Massage could not sent.")
@@ -31,3 +36,4 @@ class SMS:
         
     def cooldown(self):
         self.cool_down_state = False
+

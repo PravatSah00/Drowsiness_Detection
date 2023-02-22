@@ -47,3 +47,23 @@ def get_avg_EAR(landmarks, left_eye_inds, right_eye_inds, image_width, image_hei
 
     ear_avg = (ear_left + ear_right) / 2.0
     return ear_avg
+
+# Function to get face bounding box:
+def get_bounding_box(landmarks, face_inds, image_width, image_height):
+    cords_points = []
+    for i in face_inds:
+        landmark = landmarks[i]
+        cord = denormalize_cordinates(
+            norm_x = landmark.x,
+            norm_y = landmark.y,
+            denorm_w = image_width,
+            denorm_h = image_height
+        )
+        cords_points.append(cord)
+
+    return (
+        int(cords_points[0][0])-10,
+        int(cords_points[1][1]),
+        int(cords_points[2][0])+10,
+        int(cords_points[3][1])
+    )
